@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/gagliardetto/binary v0.6.1
-	github.com/gagliardetto/solana-go v1.3.0
+	github.com/gagliardetto/solana-go v1.3.1-0.20220222155336-dd0af958252d
 	github.com/prometheus/client_golang v1.12.1
 	go.uber.org/zap v1.16.0
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
@@ -55,5 +55,3 @@ require (
 	golang.org/x/term v0.0.0-20201210144234-2321bbc49cbf // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 )
-
-replace github.com/gagliardetto/solana-go => github.com/Blockdaemon/solana-go v0.5.2-0.20220222095515-4a3ecddb010b

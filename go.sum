@@ -40,8 +40,6 @@ filippo.io/edwards25519 v1.0.0-rc.1 h1:m0VOOB23frXZvAOK44usCgLWvtsxIoMCTBGJZlpmG
 filippo.io/edwards25519 v1.0.0-rc.1/go.mod h1:N1IkdkCkiLB6tki+MYJoSx2JTY9NUlxZE7eHn5EwJns=
 github.com/AlekSi/pointer v1.1.0 h1:SSDMPcXD9jSl8FPy9cRzoRaMJtm9g9ggGTxecRUbQoI=
 github.com/AlekSi/pointer v1.1.0/go.mod h1:y7BvfRI3wXPWKXEBhU71nbnIEEZX0QTSB2Bj48UJIZE=
-github.com/Blockdaemon/solana-go v0.5.2-0.20220222095515-4a3ecddb010b h1:4Y8d1jSuH27Ymnsr17GvtazMTmR5mfDGJCeUddNw+Kk=
-github.com/Blockdaemon/solana-go v0.5.2-0.20220222095515-4a3ecddb010b/go.mod h1:vhaJ8hSOXJamo+Eh9kpD/TeuvF6rLWBzD7LU9xg9vbk=
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
@@ -112,6 +110,8 @@ github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMo
 github.com/gagliardetto/binary v0.6.1 h1:vGrbUym10xaaswadfnuSDr0xlP3NZS5XWbLqENJidrI=
 github.com/gagliardetto/binary v0.6.1/go.mod h1:aOfYkc20U0deHaHn/LVZXiqlkDbFAX0FpTlDhsXa0S0=
 github.com/gagliardetto/gofuzz v1.2.2/go.mod h1:bkH/3hYLZrMLbfYWA0pWzXmi5TTRZnu4pMGZBkqMKvY=
+github.com/gagliardetto/solana-go v1.3.1-0.20220222155336-dd0af958252d h1:jLlpshSv9D7IRYMZRGi2sboeluGqa5pkEh5xxRBiws4=
+github.com/gagliardetto/solana-go v1.3.1-0.20220222155336-dd0af958252d/go.mod h1:vhaJ8hSOXJamo+Eh9kpD/TeuvF6rLWBzD7LU9xg9vbk=
 github.com/gagliardetto/treeout v0.1.4 h1:ozeYerrLCmCubo1TcIjFiOWTTGteOOHND1twdFpgwaw=
 github.com/gagliardetto/treeout v0.1.4/go.mod h1:loUefvXTrlRG5rYmJmExNryyBRh8f89VZhmMOyCyqok=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
