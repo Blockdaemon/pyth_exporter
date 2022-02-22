@@ -35,3 +35,25 @@ docker pull registry.gitlab.com/blockdaemon/solana/pyth_exporter/master:latest
 # Latest tagged release
 docker pull registry.gitlab.com/blockdaemon/solana/pyth_exporter:latest
 ```
+
+## Configuration
+
+```
+Usage of pyth_exporter:
+  -dev
+        Run in development mode?
+  -listen string
+        Address where to serve debug info and metrics HTTP server (default ":8080")
+  -log-level value
+        Log level
+  -products value
+        Pyth product keys (space separated)
+  -program value
+        Pyth program key
+  -publishers value
+        Pyth publishers (space separated)
+  -rpc string
+        RPC URL
+  -ws string
+        WebSocket RPC URL
+```
