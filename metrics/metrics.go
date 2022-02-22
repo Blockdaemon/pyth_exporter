@@ -25,18 +25,17 @@ var factory = promauto.With(Registry)
 
 // On-chain transaction execution status.
 const (
-	txStatusSuccess = "success"
-	txStatusFailed  = "failed"
+	TxStatusSuccess = "success"
+	TxStatusFailed  = "failed"
 )
 
 var (
-	// RPC request stats
-	rpcRequestsTotal = factory.NewCounterVec(prometheus.CounterOpts{
+	RpcRequestsTotal = factory.NewCounter(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Subsystem: SubsystemExporter,
 		Name:      "rpc_requests_total",
 		Help:      "Number of outgoing RPC requests from pyth_exporter to RPC nodes",
-	}, []string{})
+	})
 	WsActiveConns = factory.NewGauge(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: SubsystemExporter,
@@ -88,13 +87,7 @@ var (
 		Help:      "Last observed slot for Pyth publisher",
 	}, []string{labelProduct, labelPublisher})
 
-	// Publisher Observers
-	metricTxFeesTotal = factory.NewCounterVec(prometheus.CounterOpts{
-		Namespace: Namespace,
-		Name:      "tx_fees_total",
-		Help:      "Approximate amount of SOL in lamports spent on Pyth publishing",
-	}, []string{labelPublisher})
-	metricTxCount = factory.NewCounterVec(prometheus.CounterOpts{
+	TxCount = factory.NewCounterVec(prometheus.CounterOpts{
 		Namespace: Namespace,
 		Name:      "txs_total",
 		Help:      "Approximate number of Pyth transactions sent",

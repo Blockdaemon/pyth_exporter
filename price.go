@@ -8,6 +8,7 @@ import (
 	"go.blockdaemon.com/pyth_exporter/pyth"
 )
 
+// priceScraper scrapes prices out of the on-chain Pyth price accounts.
 type priceScraper struct {
 	productKeys []solana.PublicKey
 	publishKeys []solana.PublicKey

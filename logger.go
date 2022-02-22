@@ -18,5 +18,6 @@ func getLogger() *zap.Logger {
 	if err != nil {
 		panic("no logger: " + err.Error())
 	}
+	logger.Info("Log level", zap.Stringer("level", flagLogLevel))
 	return logger
 }

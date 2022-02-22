@@ -11,6 +11,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// balanceScraper retrieves the Pyth publisher balances on request.
 type balanceScraper struct {
 	*prometheus.GaugeVec
 
@@ -28,6 +29,7 @@ func newBalanceScraper(publishers []solana.PublicKey, rpcURL string, log *zap.Lo
 	}
 }
 
+// Collect gets invoked by the Prometheus exporter when a new scrape is requested.
 func (b *balanceScraper) Collect(metrics chan<- prometheus.Metric) {
 	const collectTimeout = 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), collectTimeout)

@@ -134,6 +134,14 @@ func main() {
 	balances := newBalanceScraper(publishKeys.pubkeys, *rpcURL, log.Named("balances"))
 	metrics.Registry.MustRegister(balances)
 
+	// Create tx tailer.
+	txs := newTxScraper(*rpcURL, log.Named("txs"), publishKeys.pubkeys)
+	group.Go(func() error {
+		const scrapeInterval = 5 * time.Second
+		txs.run(ctx, scrapeInterval)
+		return nil
+	})
+
 	if err := group.Wait(); err != nil {
 		log.Fatal("App crashed", zap.Error(err))
 	}
