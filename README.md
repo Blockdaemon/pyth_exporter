@@ -4,6 +4,9 @@
 
 Prometheus Exporter for Pyth Network on-chain metrics about a publisher.
 
+- Main repo: https://gitlab.com/Blockdaemon/solana/pyth_exporter
+- GitHub mirror: https://github.com/Blockdaemon/pyth_exporter
+
 ## Building
 
 ### Building from source
