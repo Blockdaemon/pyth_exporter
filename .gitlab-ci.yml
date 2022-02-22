@@ -1,0 +1,40 @@
+include:
+  - template: Jobs/Build.gitlab-ci.yml
+  - template: Jobs/Code-Intelligence.gitlab-ci.yml
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Container-Scanning.gitlab-ci.yml
+  - template: Security/License-Scanning.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+
+stages:
+  - build
+  - test
+
+.go-cache:
+  image: golang:1.17-alpine
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+    GOPRIVATE: go.blockdaemon.com,gitlab.com/Blockdaemon
+  before_script:
+    - mkdir -p .go build/
+    - apk add --no-cache build-base linux-headers git
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/".insteadOf "https://gitlab.com/"
+  cache:
+    paths:
+      - .go/pkg/mod/
+
+lint:
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:golangci-lint-alpine
+  stage: test
+  allow_failure: true
+  extends: .go-cache
+  needs: []
+  script:
+    - '[ -e .golangci.yml ] || cp /golangci/.golangci.yml .'
+    - golangci-lint run --issues-exit-code 0 --out-format code-climate | tee gl-code-quality-report.json | jq -r '.[] | "\(.location.path):\(.location.lines.begin) \(.description)"'
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+    paths:
+      - gl-code-quality-report.json

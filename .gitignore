@@ -1,0 +1,14 @@
+# IDE
+.idea/
+
+# Pyth
+*keypair.json
+.pythd/
+keystore
+
+# Env vars
+*.env
+!docker.example.env
+
+# Binaries
+/pyth_exporter
