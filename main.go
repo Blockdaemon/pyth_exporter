@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"math"
 	"net/http"
 	"strings"
 	"time"
@@ -120,35 +119,13 @@ func main() {
 	})
 
 	// Send price updates to Prometheus.
+	prices := priceScraper{
+		productKeys: productKeys.pubkeys,
+		publishKeys: publishKeys.pubkeys,
+	}
 	group.Go(func() error {
 		for update := range updates {
-			// Filter by product key.
-			var knownProduct bool
-			for _, product := range productKeys.pubkeys {
-				if product == update.Product {
-					knownProduct = true
-					break
-				}
-			}
-			if !knownProduct {
-				continue
-			}
-			decimals := math.Pow10(int(update.Exponent))
-			// Update price of each publisher.
-			for _, publisher := range publishKeys.pubkeys {
-				comp := update.GetComponent(&publisher)
-				if comp != nil {
-					metrics.PublisherSlot.
-						WithLabelValues(update.Product.String(), publisher.String()).
-						Set(float64(comp.Latest.PubSlot))
-					metrics.PublisherPrice.
-						WithLabelValues(update.Product.String(), publisher.String()).
-						Set(float64(comp.Latest.Price) * decimals)
-					metrics.PublisherConf.
-						WithLabelValues(update.Product.String(), publisher.String()).
-						Set(float64(comp.Latest.Conf) * decimals)
-				}
-			}
+			prices.onUpdate(update)
 		}
 		return nil
 	})

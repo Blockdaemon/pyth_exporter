@@ -55,6 +55,18 @@ var (
 		Name:      "publish_account_balance",
 		Help:      "SOL balance of Pyth publish account in lamports",
 	}, []string{labelPublisher})
+	AggPrice = factory.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: promNamespace,
+		Subsystem: promSubsystemOracle,
+		Name:      "aggregated_price",
+		Help:      "Last aggregated price of Pyth product",
+	}, []string{labelProduct})
+	AggConf = factory.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: promNamespace,
+		Subsystem: promSubsystemOracle,
+		Name:      "aggregated_conf_amount",
+		Help:      "Last aggregated conf of Pyth product",
+	}, []string{labelProduct})
 	PublisherPrice = factory.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: promNamespace,
 		Subsystem: promSubsystemOracle,
@@ -78,11 +90,11 @@ var (
 	metricTxFeesTotal = factory.NewCounterVec(prometheus.CounterOpts{
 		Namespace: promNamespace,
 		Name:      "tx_fees_total",
-		Help:      "Cumulative amount of SOL in lamports spent on Pyth publishing",
+		Help:      "Approximate amount of SOL in lamports spent on Pyth publishing",
 	}, []string{labelPublisher})
 	metricTxCount = factory.NewCounterVec(prometheus.CounterOpts{
 		Namespace: promNamespace,
 		Name:      "txs_total",
-		Help:      "Number of Pyth transactions sent",
+		Help:      "Approximate number of Pyth transactions sent",
 	}, []string{labelPublisher, labelTxStatus})
 )
