@@ -130,6 +130,10 @@ func main() {
 		return nil
 	})
 
+	// Scrape publisher balances.
+	balances := newBalanceScraper(publishKeys.pubkeys, *rpcURL, log.Named("balances"))
+	metrics.Registry.MustRegister(balances)
+
 	if err := group.Wait(); err != nil {
 		log.Fatal("App crashed", zap.Error(err))
 	}
