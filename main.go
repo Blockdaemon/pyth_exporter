@@ -129,6 +129,7 @@ func main() {
 
 	// Pull price updates from RPC.
 	group.Go(func() error {
+		defer close(updates)
 		return client.StreamPriceAccounts(ctx, updates)
 	})
 
