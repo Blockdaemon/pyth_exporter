@@ -50,18 +50,6 @@ var (
 		Name:      "rpc_requests_total",
 		Help:      "Number of outgoing RPC requests from pyth_exporter to RPC nodes",
 	})
-	WsActiveConns = factory.NewGauge(prometheus.GaugeOpts{
-		Namespace: Namespace,
-		Subsystem: SubsystemExporter,
-		Name:      "ws_active_conns",
-		Help:      "Number of active WebSockets between pyth_exporter and RPC nodes",
-	})
-	WsEventsTotal = factory.NewCounter(prometheus.CounterOpts{
-		Namespace: Namespace,
-		Subsystem: SubsystemExporter,
-		Name:      "ws_events_total",
-		Help:      "Number of WebSocket events delivered from RPC nodes to pyth_exporter",
-	})
 
 	PublisherBalances = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
