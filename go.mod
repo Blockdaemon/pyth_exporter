@@ -3,10 +3,9 @@ module go.blockdaemon.com/pyth_exporter
 go 1.17
 
 require (
-	github.com/cenkalti/backoff/v4 v4.1.2
-	github.com/gagliardetto/binary v0.6.1
 	github.com/gagliardetto/solana-go v1.3.1-0.20220222155336-dd0af958252d
 	github.com/prometheus/client_golang v1.12.1
+	go.blockdaemon.com/pyth v0.1.0
 	go.uber.org/zap v1.16.0
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
 )
@@ -19,10 +18,12 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blendle/zapdriver v1.3.1 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
+	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dfuse-io/logging v0.0.0-20210109005628-b97a57253f70 // indirect
 	github.com/fatih/color v1.9.0 // indirect
+	github.com/gagliardetto/binary v0.6.1 // indirect
 	github.com/gagliardetto/treeout v0.1.4 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

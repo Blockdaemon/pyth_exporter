@@ -18,8 +18,8 @@ import (
 	"math"
 
 	"github.com/gagliardetto/solana-go"
+	"go.blockdaemon.com/pyth"
 	"go.blockdaemon.com/pyth_exporter/metrics"
-	"go.blockdaemon.com/pyth_exporter/pyth"
 )
 
 // priceScraper scrapes prices out of the on-chain Pyth price accounts.

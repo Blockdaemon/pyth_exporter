@@ -24,8 +24,8 @@ import (
 
 	"github.com/gagliardetto/solana-go"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.blockdaemon.com/pyth"
 	"go.blockdaemon.com/pyth_exporter/metrics"
-	"go.blockdaemon.com/pyth_exporter/pyth"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
