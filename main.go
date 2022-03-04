@@ -51,6 +51,7 @@ func main() {
 	flag.Parse()
 
 	log := getLogger()
+	defer log.Sync()
 
 	// Check flag values.
 	if programKey.IsZero() || !programKey.IsOnCurve() {
@@ -116,19 +117,20 @@ func main() {
 			const shutdownGracePeriod = 5 * time.Second
 			shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownGracePeriod)
 			defer cancel()
-			httpLog.Info("Shutting down HTTP server")
+			httpLog.Info("Stopping HTTP server")
 			if err := server.Shutdown(shutdownCtx); err != nil {
 				httpLog.Error("Error during server shutdown", zap.Error(err))
 			}
 		}()
 
 		httpLog.Info("Starting HTTP server", zap.String("listen", *listen))
-		defer httpLog.Info("Stopped HTTP server")
+		defer httpLog.Debug("Stopped HTTP server")
 		return server.ListenAndServe()
 	})
 
 	// Pull price updates from RPC.
 	group.Go(func() error {
+		defer log.Debug("Stopped price streamer")
 		defer close(updates)
 		return client.StreamPriceAccounts(ctx, updates)
 	})
@@ -139,6 +141,7 @@ func main() {
 		publishKeys: publishKeys.pubkeys,
 	}
 	group.Go(func() error {
+		defer log.Debug("Stopped price scraper")
 		for update := range updates {
 			prices.onUpdate(update)
 		}
@@ -152,6 +155,7 @@ func main() {
 	// Create tx tailer.
 	txs := newTxScraper(*rpcURL, log.Named("txs"), publishKeys.pubkeys)
 	group.Go(func() error {
+		defer log.Debug("Stopped tx tailer")
 		const scrapeInterval = 5 * time.Second
 		txs.run(ctx, scrapeInterval)
 		return nil
