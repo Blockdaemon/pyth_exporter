@@ -59,8 +59,12 @@ func (b *balanceScraper) update(ctx context.Context) {
 		return
 	}
 	for i, acc := range res.Value {
+		var balance float64
+		if acc != nil {
+			balance = float64(acc.Lamports)
+		}
 		b.GaugeVec.
 			WithLabelValues(b.publishers[i].String()).
-			Set(float64(acc.Lamports))
+			Set(balance)
 	}
 }
