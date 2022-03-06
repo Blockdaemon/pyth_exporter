@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/gagliardetto/solana-go"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.blockdaemon.com/pyth"
 	"go.blockdaemon.com/pyth_exporter/metrics"
@@ -40,10 +41,11 @@ func main() {
 	flag.BoolVar(&flagDev, "dev", false, "Run in development mode?")
 	listen := flag.String("listen", ":8080", "Address where to serve debug info and metrics HTTP server")
 	flag.Var(&flagLogLevel, "log-level", "Log level")
+	envStr := flag.String("env", "mainnet", "Pyth env (devnet, testnet, mainnet)")
 	var programKey solana.PublicKey
-	flag.Var(&programKey, "program", "Pyth program key")
-	rpcURL := flag.String("rpc", "", "RPC URL")
-	wsURL := flag.String("ws", "", "WebSocket RPC URL")
+	flag.Var(&programKey, "program", "Pyth program key (derived from env)")
+	rpcURL := flag.String("rpc", "", "Solana RPC URL")
+	wsURL := flag.String("ws", "", "Solana WebSocket RPC URL")
 	var productKeys pubkeyList
 	flag.Var(&productKeys, "products", "Pyth product keys")
 	var publishKeys pubkeyList
@@ -54,8 +56,23 @@ func main() {
 	defer log.Sync()
 
 	// Check flag values.
-	if programKey.IsZero() || !programKey.IsOnCurve() {
-		log.Fatal("Invalid -program flag")
+	var env pyth.Env
+	if programKey.IsZero() {
+		switch *envStr {
+		case "devnet":
+			env = pyth.Devnet
+		case "testnet":
+			env = pyth.Testnet
+		case "mainnet":
+			env = pyth.Mainnet
+		default:
+			log.Fatal("Missing -program or -env flag")
+		}
+	} else {
+		env = pyth.Env{
+			Program: programKey,
+			Mapping: solana.PublicKey{}, // mapping not required
+		}
 	}
 	if *rpcURL == "" {
 		log.Fatal("Missing -rpc flag")
@@ -75,12 +92,7 @@ func main() {
 
 	ctx := context.Background()
 
-	client := pyth.Client{
-		Opts:         pyth.Opts{ProgramKey: programKey},
-		Log:          log.Named("pyth"),
-		WebSocketURL: *wsURL,
-	}
-	updates := make(chan pyth.PriceAccountUpdate)
+	client := pyth.NewClient(env, *rpcURL, *wsURL)
 
 	group, ctx := errgroup.WithContext(ctx)
 
@@ -101,7 +113,7 @@ func main() {
 			rw.WriteHeader(http.StatusOK)
 			_, _ = rw.Write([]byte("ok"))
 		})
-		http.Handle("/metrics", promhttp.HandlerFor(metrics.Registry, promhttp.HandlerOpts{
+		http.Handle("/metrics", promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{
 			ErrorLog:          errorLog,
 			EnableOpenMetrics: true,
 		}))
@@ -129,10 +141,14 @@ func main() {
 	})
 
 	// Pull price updates from RPC.
+	priceStream := client.StreamPriceAccounts()
+	go func() {
+		defer priceStream.Close()
+		<-ctx.Done()
+	}()
 	group.Go(func() error {
 		defer log.Debug("Stopped price streamer")
-		defer close(updates)
-		return client.StreamPriceAccounts(ctx, updates)
+		return priceStream.Err()
 	})
 
 	// Send price updates to Prometheus.
@@ -142,7 +158,7 @@ func main() {
 	}
 	group.Go(func() error {
 		defer log.Debug("Stopped price scraper")
-		for update := range updates {
+		for update := range priceStream.Updates() {
 			prices.onUpdate(update)
 		}
 		return nil

@@ -34,7 +34,7 @@ const (
 	labelTxStatus  = "tx_status"
 )
 
-var Registry = prometheus.NewRegistry()
+var Registry = prometheus.DefaultRegisterer
 var factory = promauto.With(Registry)
 
 // On-chain transaction execution status.
