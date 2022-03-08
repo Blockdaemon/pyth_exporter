@@ -63,6 +63,9 @@ func (p *priceScraper) aggregate(product *solana.PublicKey, agg *pyth.PriceInfo,
 	metrics.AggConf.
 		WithLabelValues(productStr).
 		Set(float64(agg.Conf) * decimals)
+	metrics.AggStatus.
+		WithLabelValues(productStr).
+		Set(float64(agg.Status))
 }
 
 func (p *priceScraper) updateAllPublishers(price *pyth.PriceAccount, decimals float64) {
@@ -97,4 +100,7 @@ func (p *priceScraper) component(product *solana.PublicKey, publisher *solana.Pu
 	metrics.PublisherConf.
 		WithLabelValues(productStr, publisherStr).
 		Set(float64(comp.Latest.Conf) * decimals)
+	metrics.PublisherStatus.
+		WithLabelValues(productStr, publisherStr).
+		Set(float64(comp.Latest.Status))
 }

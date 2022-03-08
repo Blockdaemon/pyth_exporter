@@ -70,6 +70,12 @@ var (
 		Name:      "aggregated_conf_amount",
 		Help:      "Last aggregated conf of Pyth product",
 	}, []string{labelProduct})
+	AggStatus = factory.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Subsystem: SubsystemOracle,
+		Name:      "aggregated_status",
+		Help:      "Aggregated trading status of Pyth product",
+	}, []string{labelProduct})
 	PublisherPrice = factory.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: SubsystemOracle,
@@ -87,6 +93,12 @@ var (
 		Subsystem: SubsystemOracle,
 		Name:      "publisher_slot",
 		Help:      "Last observed slot for Pyth publisher",
+	}, []string{labelProduct, labelPublisher})
+	PublisherStatus = factory.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Subsystem: SubsystemOracle,
+		Name:      "publisher_status",
+		Help:      "Trading status for Pyth publisher",
 	}, []string{labelProduct, labelPublisher})
 
 	TxCount = factory.NewCounterVec(prometheus.CounterOpts{
