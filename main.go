@@ -98,23 +98,26 @@ func main() {
 	// If running without filters, we might need to list all publishers first (by listing all mappings, products, and prices).
 	client := pyth.NewClient(env, *rpcURL, *wsURL)
 	allPublishers := publishKeys.pubkeys
+
+	const initTimeout = 30 * time.Second
+	initContext, initCancel := context.WithTimeout(context.Background(), initTimeout)
+
+	log.Info("Listing all products")
+	productCache, products, err := discoverProducts(initContext, client)
+	if err != nil {
+		log.Fatal("Failed to list products")
+	}
 	if len(allPublishers) == 0 {
 		log.Info("Listing all publishers")
-
-		const initTimeout = 30 * time.Second
-		initContext, initCancel := context.WithTimeout(context.Background(), initTimeout)
-
-		var err error
-		allPublishers, err = discoverPublishers(initContext, client)
+		allPublishers, err = discoverPublishers(initContext, client, products)
 		if err != nil {
 			log.Fatal("Failed to discover publishers", zap.Error(err))
 		}
-
-		initCancel()
 	}
 
 	// The main context is composed of a loose set of services.
 	// If any of them terminates, the rest will get terminated gracefully through context.
+	initCancel()
 	ctx := context.Background()
 	group, ctx := errgroup.WithContext(ctx)
 
@@ -175,8 +178,10 @@ func main() {
 
 	// Send price updates to Prometheus.
 	prices := priceScraper{
-		productKeys: productKeys.pubkeys,
-		publishKeys: publishKeys.pubkeys,
+		log:          log.Named("scraper"),
+		productKeys:  productKeys.pubkeys,
+		publishKeys:  publishKeys.pubkeys,
+		productCache: productCache,
 	}
 	group.Go(func() error {
 		defer log.Debug("Stopped price scraper")
@@ -186,12 +191,12 @@ func main() {
 		return nil
 	})
 
-	// Scrape publisher balances.
-	balances := newBalanceScraper(publishKeys.pubkeys, *rpcURL, log.Named("balances"))
-	metrics.Registry.MustRegister(balances)
-
-	// Create tx tailer.
 	if len(allPublishers) > 0 {
+		// Scrape publisher balances.
+		balances := newBalanceScraper(publishKeys.pubkeys, *rpcURL, log.Named("balances"))
+		metrics.Registry.MustRegister(balances)
+
+		// Create tx tailer.
 		txs := newTxScraper(*rpcURL, log.Named("txs"), allPublishers)
 		group.Go(func() error {
 			defer log.Debug("Stopped tx tailer")
@@ -234,8 +239,14 @@ func (p *pubkeyList) String() string {
 }
 
 // discoverPublishers scrapes all authorized publishers for all products from the Pyth program.
-func discoverPublishers(ctx context.Context, client *pyth.Client) ([]solana.PublicKey, error) {
-	entries, err := client.GetAllPriceAccounts(ctx, rpc.CommitmentProcessed)
+func discoverPublishers(ctx context.Context, client *pyth.Client, products []pyth.ProductAccountEntry) ([]solana.PublicKey, error) {
+	priceKeys := make([]solana.PublicKey, 0, len(products))
+	for _, product := range products {
+		if !product.FirstPrice.IsZero() {
+			priceKeys = append(priceKeys, product.FirstPrice)
+		}
+	}
+	entries, err := client.GetPriceAccountsRecursive(ctx, rpc.CommitmentProcessed, priceKeys...)
 	if err != nil {
 		return nil, err
 	}

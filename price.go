@@ -20,12 +20,15 @@ import (
 	"github.com/gagliardetto/solana-go"
 	"go.blockdaemon.com/pyth"
 	"go.blockdaemon.com/pyth_exporter/metrics"
+	"go.uber.org/zap"
 )
 
 // priceScraper scrapes prices out of the on-chain Pyth price accounts.
 type priceScraper struct {
-	productKeys []solana.PublicKey // if empty, scrape all products
-	publishKeys []solana.PublicKey // if empty, scrape all publishers
+	log          *zap.Logger
+	productKeys  []solana.PublicKey // if empty, scrape all products
+	publishKeys  []solana.PublicKey // if empty, scrape all publishers
+	productCache *productCacher
 }
 
 func (p *priceScraper) onUpdate(update pyth.PriceAccountEntry) {
@@ -56,15 +59,19 @@ func (p *priceScraper) isInteresting(update pyth.PriceAccountEntry) bool {
 
 // aggregate exports price as aggregated by the smart contract.
 func (p *priceScraper) aggregate(product *solana.PublicKey, agg *pyth.PriceInfo, decimals float64) {
+	symbol, ok := p.symbolName(product)
+	if !ok {
+		return
+	}
 	productStr := product.String()
 	metrics.AggPrice.
-		WithLabelValues(productStr).
+		WithLabelValues(productStr, symbol).
 		Set(float64(agg.Price) * decimals)
 	metrics.AggConf.
-		WithLabelValues(productStr).
+		WithLabelValues(productStr, symbol).
 		Set(float64(agg.Conf) * decimals)
 	metrics.AggStatus.
-		WithLabelValues(productStr).
+		WithLabelValues(productStr, symbol).
 		Set(float64(agg.Status))
 }
 
@@ -90,17 +97,30 @@ func (p *priceScraper) updateSpecificPublishers(price *pyth.PriceAccount, decima
 // component exports a price component (i.e. a price value published by an individual Pyth publisher).
 func (p *priceScraper) component(product *solana.PublicKey, publisher *solana.PublicKey, comp *pyth.PriceComp, decimals float64) {
 	productStr := product.String()
+	symbol, ok := p.symbolName(product)
+	if !ok {
+		return
+	}
 	publisherStr := publisher.String()
 	metrics.PublisherSlot.
-		WithLabelValues(productStr, publisherStr).
+		WithLabelValues(productStr, symbol, publisherStr).
 		Set(float64(comp.Latest.PubSlot))
 	metrics.PublisherPrice.
-		WithLabelValues(productStr, publisherStr).
+		WithLabelValues(productStr, symbol, publisherStr).
 		Set(float64(comp.Latest.Price) * decimals)
 	metrics.PublisherConf.
-		WithLabelValues(productStr, publisherStr).
+		WithLabelValues(productStr, symbol, publisherStr).
 		Set(float64(comp.Latest.Conf) * decimals)
 	metrics.PublisherStatus.
-		WithLabelValues(productStr, publisherStr).
+		WithLabelValues(productStr, symbol, publisherStr).
 		Set(float64(comp.Latest.Status))
+}
+
+func (p *priceScraper) symbolName(product *solana.PublicKey) (string, bool) {
+	symbol, err := p.productCache.getSymbol(*product)
+	if err != nil {
+		p.log.Warn("failed to get product info", zap.Stringer("product", *product), zap.Error(err))
+		return "", false
+	}
+	return symbol, true
 }
