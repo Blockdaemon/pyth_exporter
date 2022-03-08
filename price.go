@@ -24,26 +24,28 @@ import (
 
 // priceScraper scrapes prices out of the on-chain Pyth price accounts.
 type priceScraper struct {
-	productKeys []solana.PublicKey
-	publishKeys []solana.PublicKey
+	productKeys []solana.PublicKey // if empty, scrape all products
+	publishKeys []solana.PublicKey // if empty, scrape all publishers
 }
 
-func (p *priceScraper) onUpdate(update pyth.PriceAccountUpdate) {
+func (p *priceScraper) onUpdate(update pyth.PriceAccountEntry) {
 	if !p.isInteresting(update) {
 		return
 	}
 	decimals := math.Pow10(int(update.Exponent))
 	p.aggregate(&update.Product, &update.Agg, decimals)
-	// Update price of each publisher.
-	for _, publisher := range p.publishKeys {
-		comp := update.GetComponent(&publisher)
-		if comp != nil {
-			p.component(&update.Product, &publisher, comp, decimals)
-		}
+
+	if len(p.publishKeys) > 0 {
+		p.updateSpecificPublishers(update.PriceAccount, decimals)
+	} else {
+		p.updateAllPublishers(update.PriceAccount, decimals)
 	}
 }
 
-func (p *priceScraper) isInteresting(update pyth.PriceAccountUpdate) bool {
+func (p *priceScraper) isInteresting(update pyth.PriceAccountEntry) bool {
+	if len(p.productKeys) == 0 {
+		return true // filtering disabled, always interesting.
+	}
 	for _, product := range p.productKeys {
 		if product == update.Product {
 			return true
@@ -61,6 +63,25 @@ func (p *priceScraper) aggregate(product *solana.PublicKey, agg *pyth.PriceInfo,
 	metrics.AggConf.
 		WithLabelValues(productStr).
 		Set(float64(agg.Conf) * decimals)
+}
+
+func (p *priceScraper) updateAllPublishers(price *pyth.PriceAccount, decimals float64) {
+	for i := range price.Components {
+		comp := &price.Components[i]
+		if comp.Publisher.IsZero() {
+			continue
+		}
+		p.component(&price.Product, &comp.Publisher, comp, decimals)
+	}
+}
+
+func (p *priceScraper) updateSpecificPublishers(price *pyth.PriceAccount, decimals float64) {
+	for _, publisher := range p.publishKeys {
+		comp := price.GetComponent(&publisher)
+		if comp != nil {
+			p.component(&price.Product, &publisher, comp, decimals)
+		}
+	}
 }
 
 // component exports a price component (i.e. a price value published by an individual Pyth publisher).

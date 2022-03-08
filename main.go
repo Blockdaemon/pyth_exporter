@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/gagliardetto/solana-go"
+	"github.com/gagliardetto/solana-go/rpc"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.blockdaemon.com/pyth"
@@ -38,7 +39,7 @@ var (
 
 func main() {
 	// Define flags.
-	flag.BoolVar(&flagDev, "dev", false, "Run in development mode?")
+	flag.BoolVar(&flagDev, "dev", false, "Run in development mode")
 	listen := flag.String("listen", ":8080", "Address where to serve debug info and metrics HTTP server")
 	flag.Var(&flagLogLevel, "log-level", "Log level")
 	envStr := flag.String("env", "mainnet", "Pyth env (devnet, testnet, mainnet)")
@@ -46,10 +47,10 @@ func main() {
 	flag.Var(&programKey, "program", "Pyth program key (derived from env)")
 	rpcURL := flag.String("rpc", "", "Solana RPC URL")
 	wsURL := flag.String("ws", "", "Solana WebSocket RPC URL")
-	var productKeys pubkeyList
-	flag.Var(&productKeys, "products", "Pyth product keys")
+	var productKeys pubkeyList // if empty, assuming all products
+	flag.Var(&productKeys, "products", "Pyth product keys (default all)")
 	var publishKeys pubkeyList
-	flag.Var(&publishKeys, "publishers", "Pyth publishers")
+	flag.Var(&publishKeys, "publishers", "Pyth publishers (default all)")
 	flag.Parse()
 
 	log := getLogger()
@@ -83,17 +84,29 @@ func main() {
 		}
 		*wsURL = "ws" + strings.TrimPrefix(*rpcURL, "http")
 	}
-	if len(productKeys.pubkeys) == 0 {
-		log.Fatal("Missing -products flag")
-	}
-	if len(publishKeys.pubkeys) == 0 {
-		log.Fatal("Missing -publishers flag")
-	}
 
-	ctx := context.Background()
-
+	// Initiate connectivity to Pyth.
+	// If running without filters, we might need to list all publishers first (by listing all mappings, products, and prices).
 	client := pyth.NewClient(env, *rpcURL, *wsURL)
+	allPublishers := publishKeys.pubkeys
+	if len(allPublishers) == 0 {
+		log.Info("Listing all publishers")
 
+		const initTimeout = 30 * time.Second
+		initContext, initCancel := context.WithTimeout(context.Background(), initTimeout)
+
+		var err error
+		allPublishers, err = discoverPublishers(initContext, client)
+		if err != nil {
+			log.Fatal("Failed to discover publishers", zap.Error(err))
+		}
+
+		initCancel()
+	}
+
+	// The main context is composed of a loose set of services.
+	// If any of them terminates, the rest will get terminated gracefully through context.
+	ctx := context.Background()
 	group, ctx := errgroup.WithContext(ctx)
 
 	// Start HTTP server.
@@ -169,7 +182,7 @@ func main() {
 	metrics.Registry.MustRegister(balances)
 
 	// Create tx tailer.
-	txs := newTxScraper(*rpcURL, log.Named("txs"), publishKeys.pubkeys)
+	txs := newTxScraper(*rpcURL, log.Named("txs"), allPublishers)
 	group.Go(func() error {
 		defer log.Debug("Stopped tx tailer")
 		const scrapeInterval = 5 * time.Second
@@ -207,4 +220,28 @@ func (p *pubkeyList) String() string {
 		builder.WriteString(pubkey.String())
 	}
 	return builder.String()
+}
+
+// discoverPublishers scrapes all authorized publishers for all products from the Pyth program.
+func discoverPublishers(ctx context.Context, client *pyth.Client) ([]solana.PublicKey, error) {
+	entries, err := client.GetAllPriceAccounts(ctx, rpc.CommitmentProcessed)
+	if err != nil {
+		return nil, err
+	}
+
+	publishers := make(map[solana.PublicKey]struct{})
+	for _, entry := range entries {
+		for _, comp := range entry.Components {
+			if !comp.Publisher.IsZero() {
+				publishers[comp.Publisher] = struct{}{}
+			}
+		}
+	}
+
+	publishKeys := make([]solana.PublicKey, 0, len(publishers))
+	for pub := range publishers {
+		publishKeys = append(publishKeys, pub)
+	}
+
+	return publishKeys, nil
 }

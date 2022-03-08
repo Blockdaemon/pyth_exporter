@@ -25,6 +25,8 @@ import (
 	"go.uber.org/zap"
 )
 
+// TODO(richard): consider using logsSubscribe() instead of polling.
+
 // txScraper polls publisher transactions.
 type txScraper struct {
 	tailers []*txTailer
@@ -49,6 +51,8 @@ func newTxScraper(rpcURL string, log *zap.Logger, publishers []solana.PublicKey)
 func (s *txScraper) run(ctx context.Context, interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
+
+	s.log.Info("Polling transactions of publishers", zap.Int("num_publishers", len(s.tailers)))
 
 	for {
 	wait:
