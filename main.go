@@ -45,6 +45,8 @@ func main() {
 	envStr := flag.String("env", "mainnet", "Pyth env (devnet, testnet, mainnet)")
 	var programKey solana.PublicKey
 	flag.Var(&programKey, "program", "Pyth program key (derived from env)")
+	var mappingKey solana.PublicKey
+	flag.Var(&mappingKey, "mapping", "Pyth mapping key (derived from env)")
 	rpcURL := flag.String("rpc", "", "Solana RPC URL")
 	wsURL := flag.String("ws", "", "Solana WebSocket RPC URL")
 	var productKeys pubkeyList // if empty, assuming all products
@@ -69,11 +71,18 @@ func main() {
 		default:
 			log.Fatal("Missing -program or -env flag")
 		}
+		log.Sugar().Infof("Using network %s", *envStr)
 	} else {
 		env = pyth.Env{
 			Program: programKey,
-			Mapping: solana.PublicKey{}, // mapping not required
 		}
+		log.Sugar().Infof("Using program ID %s", programKey)
+	}
+	if !mappingKey.IsZero() {
+		env.Mapping = mappingKey
+	}
+	if env.Mapping.IsZero() {
+		log.Fatal("Missing mapping key")
 	}
 	if *rpcURL == "" {
 		log.Fatal("Missing -rpc flag")
@@ -182,13 +191,15 @@ func main() {
 	metrics.Registry.MustRegister(balances)
 
 	// Create tx tailer.
-	txs := newTxScraper(*rpcURL, log.Named("txs"), allPublishers)
-	group.Go(func() error {
-		defer log.Debug("Stopped tx tailer")
-		const scrapeInterval = 5 * time.Second
-		txs.run(ctx, scrapeInterval)
-		return nil
-	})
+	if len(allPublishers) > 0 {
+		txs := newTxScraper(*rpcURL, log.Named("txs"), allPublishers)
+		group.Go(func() error {
+			defer log.Debug("Stopped tx tailer")
+			const scrapeInterval = 5 * time.Second
+			txs.run(ctx, scrapeInterval)
+			return nil
+		})
+	}
 
 	if err := group.Wait(); err != nil {
 		log.Fatal("App crashed", zap.Error(err))
