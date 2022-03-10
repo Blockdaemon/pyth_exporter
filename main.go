@@ -105,7 +105,7 @@ func main() {
 	log.Info("Listing all products")
 	productCache, products, err := discoverProducts(initContext, client)
 	if err != nil {
-		log.Fatal("Failed to list products")
+		log.Fatal("Failed to list products", zap.Error(err))
 	}
 	if len(allPublishers) == 0 {
 		log.Info("Listing all publishers")
@@ -193,7 +193,7 @@ func main() {
 
 	if len(allPublishers) > 0 {
 		// Scrape publisher balances.
-		balances := newBalanceScraper(publishKeys.pubkeys, *rpcURL, log.Named("balances"))
+		balances := newBalanceScraper(allPublishers, *rpcURL, log.Named("balances"))
 		metrics.Registry.MustRegister(balances)
 
 		// Create tx tailer.

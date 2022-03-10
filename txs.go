@@ -83,11 +83,11 @@ func (s *txScraper) pollOne(ctx context.Context, wg *sync.WaitGroup, tailer *txT
 	defer wg.Done()
 	for {
 		isEnd, err := tailer.poll(ctx)
-		if isEnd {
-			break
-		}
 		if err != nil {
 			s.log.Warn("Failed to poll account txs", zap.Error(err))
+		}
+		if isEnd {
+			break
 		}
 	}
 }
@@ -111,6 +111,9 @@ func newTxTailer(scraper *txScraper, pubkey solana.PublicKey) *txTailer {
 }
 
 func (t *txTailer) refreshLastSig(ctx context.Context) error {
+	t.log.Debug("Getting latest sig",
+		zap.String("publisher", t.pubkeyStr))
+
 	oneInt := 1
 	sigs, err := t.rpc.GetSignaturesForAddressWithOpts(ctx, t.pubkey, &rpc.GetSignaturesForAddressOpts{
 		Limit: &oneInt,
@@ -121,10 +124,17 @@ func (t *txTailer) refreshLastSig(ctx context.Context) error {
 	metrics.RpcRequestsTotal.Inc()
 
 	if len(sigs) == 0 {
+		t.log.Debug("Publisher has not sent any txs yet",
+			zap.String("publisher", t.pubkeyStr))
 		return nil // empty account
 	}
 	t.lastSlot = sigs[0].Slot
 	t.lastSig = sigs[0].Signature
+
+	t.log.Debug("Tailing txs starting at",
+		zap.String("publisher", t.pubkeyStr),
+		zap.Stringer("start_sig", t.lastSig))
+
 	return nil
 }
 

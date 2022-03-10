@@ -70,6 +70,9 @@ func (p *priceScraper) aggregate(product *solana.PublicKey, agg *pyth.PriceInfo,
 	metrics.AggConf.
 		WithLabelValues(productStr, symbol).
 		Set(float64(agg.Conf) * decimals)
+	metrics.AggSlot.
+		WithLabelValues(productStr, symbol).
+		Set(float64(agg.PubSlot))
 	metrics.AggStatus.
 		WithLabelValues(productStr, symbol).
 		Set(float64(agg.Status))

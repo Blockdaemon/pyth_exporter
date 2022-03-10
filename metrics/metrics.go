@@ -71,6 +71,12 @@ var (
 		Name:      "aggregated_conf_amount",
 		Help:      "Last aggregated conf of Pyth product",
 	}, []string{labelProduct, labelSymbol})
+	AggSlot = factory.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: Namespace,
+		Subsystem: SubsystemOracle,
+		Name:      "aggregated_slot",
+		Help:      "Last observed slot for Pyth product",
+	}, []string{labelProduct, labelSymbol})
 	AggStatus = factory.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: SubsystemOracle,
