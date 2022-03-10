@@ -373,8 +373,8 @@ github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
-go.blockdaemon.com/pyth v0.3.4 h1:NzLH9O4tWd9VINU329JkZ2ZU5Pb0DqJliwCXPRiagOk=
-go.blockdaemon.com/pyth v0.3.4/go.mod h1:Pz/ynthyHO8Z92C5a8rfx18l+GoGygrDUJ3dqN6xetY=
+go.blockdaemon.com/pyth v0.3.5 h1:NW6cqfz/Zg1MATWswZXf8ZRPIWCw8xFuf/+YLNtcFYE=
+go.blockdaemon.com/pyth v0.3.5/go.mod h1:Pz/ynthyHO8Z92C5a8rfx18l+GoGygrDUJ3dqN6xetY=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
