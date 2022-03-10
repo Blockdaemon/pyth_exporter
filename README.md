@@ -122,3 +122,25 @@ View service logs
 ```shell
 docker-compose logs
 ```
+
+## Screenshots
+
+**Overview**
+
+![Overview](./docs/grafana-overview.png)
+
+**Status Matrix**
+
+![Status Matrix](./docs/grafana-status-matrix.png)
+
+**Aggregated Price**
+
+![Aggregated Price](./docs/grafana-price.png)
+
+**Multiple Price Components**
+
+![Multiple Price Components](./docs/grafana-price-components.png)
+
+**Single Price Component**
+
+![Single Price Component](./docs/grafana-price-published.png)
