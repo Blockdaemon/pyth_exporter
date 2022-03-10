@@ -63,40 +63,62 @@ Usage of pyth_exporter:
         Solana WebSocket RPC URL
 ```
 
-## Metrics
+## Deployment
 
+[./docker-compose.yml](./docker-compose.yml) defines a reference [Docker Compose](https://docs.docker.com/compose/) deployment on a single host.
+
+The compose config includes the following services:
+- pyth_exporter (this repo)
+- Prometheus monitoring agent
+- Grafana monitoring UI
+
+### Requirements
+
+The reference deployment requires Docker Compose: [Compose installation guide](https://docs.docker.com/compose/install/)
+
+### Configuration
+
+The env vars file contains deployment-specific config.
+Copy the example config and adjust it.
+
+```shell
+cp docker.example.env docker.env
+$EDITOR docker.env
 ```
-% curl http://localhost:8080/metrics
 
-# HELP pyth_exporter_rpc_requests_total Number of outgoing RPC requests from pyth_exporter to RPC nodes
-# TYPE pyth_exporter_rpc_requests_total counter
-pyth_exporter_rpc_requests_total 24
-# HELP pyth_exporter_ws_active_conns Number of active WebSockets between pyth_exporter and RPC nodes
-# TYPE pyth_exporter_ws_active_conns gauge
-pyth_exporter_ws_active_conns 1
-# HELP pyth_exporter_ws_events_total Number of WebSocket events delivered from RPC nodes to pyth_exporter
-# TYPE pyth_exporter_ws_events_total counter
-pyth_exporter_ws_events_total 14408
-# HELP pyth_oracle_aggregated_conf_amount Last aggregated conf of Pyth product
-# TYPE pyth_oracle_aggregated_conf_amount gauge
-pyth_oracle_aggregated_conf_amount{pyth_product="EWxGfxoPQSNA2744AYdAKmsQZ8F9o9M7oKkvL3VM1dko"} 2e-05
-# HELP pyth_oracle_aggregated_price Last aggregated price of Pyth product
-# TYPE pyth_oracle_aggregated_price gauge
-pyth_oracle_aggregated_price{pyth_product="EWxGfxoPQSNA2744AYdAKmsQZ8F9o9M7oKkvL3VM1dko"} 1.1326100000000001
-# HELP pyth_oracle_publisher_conf_amount Last published product confidence by Pyth publisher
-# TYPE pyth_oracle_publisher_conf_amount gauge
-pyth_oracle_publisher_conf_amount{pyth_product="EWxGfxoPQSNA2744AYdAKmsQZ8F9o9M7oKkvL3VM1dko",pyth_publisher="AKPWGLY5KpxbTx7DaVp4Pve8JweMjKbb1A19MyL2nrYT"} 0.00014000000000000001
-# HELP pyth_oracle_publisher_price Last published product price by Pyth publisher
-# TYPE pyth_oracle_publisher_price gauge
-pyth_oracle_publisher_price{pyth_product="EWxGfxoPQSNA2744AYdAKmsQZ8F9o9M7oKkvL3VM1dko",pyth_publisher="AKPWGLY5KpxbTx7DaVp4Pve8JweMjKbb1A19MyL2nrYT"} 1.1326500000000002
-# HELP pyth_oracle_publisher_slot Last observed slot for Pyth publisher
-# TYPE pyth_oracle_publisher_slot gauge
-pyth_oracle_publisher_slot{pyth_product="EWxGfxoPQSNA2744AYdAKmsQZ8F9o9M7oKkvL3VM1dko",pyth_publisher="AKPWGLY5KpxbTx7DaVp4Pve8JweMjKbb1A19MyL2nrYT"} 1.16427278e+08
-# HELP pyth_solana_publish_account_balance SOL balance of Pyth publish account in lamports
-# TYPE pyth_solana_publish_account_balance gauge
-pyth_solana_publish_account_balance{pyth_publisher="AKPWGLY5KpxbTx7DaVp4Pve8JweMjKbb1A19MyL2nrYT"} 4.950539e+10
-# HELP pyth_txs_total Approximate number of Pyth transactions sent
-# TYPE pyth_txs_total counter
-pyth_txs_total{pyth_publisher="AKPWGLY5KpxbTx7DaVp4Pve8JweMjKbb1A19MyL2nrYT",tx_status="failed"} 10
-pyth_txs_total{pyth_publisher="AKPWGLY5KpxbTx7DaVp4Pve8JweMjKbb1A19MyL2nrYT",tx_status="success"} 67
+- `*_IMAGE`: Docker image strings
+- `SOLANA_RPC`: Solana RPC access
+- `SOLANA_WS`: Solana WebSocket access
+- `SOLANA_ENV`: Environment name (devnet, testnet, mainnet)
+
+### Operations
+
+Start all services
+
+```shell
+docker-compose --env-file docker.env up -d
+```
+
+Stop all services
+
+```shell
+docker-compose down
+```
+
+Stop all services and delete all data (!)
+
+```shell
+docker-compose down -v --remove-orphans
+```
+
+View service status
+
+```shell
+docker-compose ps
+```
+
+View service logs
+
+```shell
+docker-compose logs
 ```

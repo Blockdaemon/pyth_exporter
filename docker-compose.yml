@@ -1,0 +1,44 @@
+# Example docker-compose deployment.
+version: '3'
+
+volumes:
+  prometheus_storage: {}
+  grafana_storage: {}
+
+services:
+  # Prometheus exporter
+  pyth_exporter:
+    # --- Release build
+    # image: "${PYTH_EXPORTER_IMAGE}"
+    # --- Development build
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    restart: unless-stopped
+    command:
+      - "--listen=:8080"
+      - "--log-level=info"
+      - "--env=${SOLANA_ENV}"
+      - "--rpc=${SOLANA_RPC}"
+      - "--ws=${SOLANA_WS}"
+
+  # Prometheus monitoring agent
+  prometheus:
+    image: "${PROMETHEUS_IMAGE}"
+    restart: unless-stopped
+    ports:
+      - '9090:9090'
+    volumes:
+      - 'prometheus_storage:/prometheus'
+      - './docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro'
+
+  # Grafana UI
+  grafana:
+    image: "${GRAFANA_IMAGE}"
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - 'grafana_storage:/var/lib/grafana'
+      - './docker/grafana/grafana.ini:/etc/grafana/grafana.ini:ro'
+      - './docker/grafana/provisioning:/etc/grafana/provisioning:ro'
