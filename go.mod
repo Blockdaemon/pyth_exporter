@@ -6,7 +6,7 @@ require (
 	github.com/gagliardetto/solana-go v1.3.1-0.20220222155336-dd0af958252d
 	github.com/prometheus/client_golang v1.12.2
 	go.blockdaemon.com/pyth v0.3.7
-	go.uber.org/zap v1.21.0
+	go.uber.org/zap v1.22.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
