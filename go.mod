@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/gagliardetto/solana-go v1.7.1
-	github.com/prometheus/client_golang v1.13.1
+	github.com/prometheus/client_golang v1.14.0
 	go.blockdaemon.com/pyth v0.3.7
 	go.uber.org/zap v1.23.0
 	golang.org/x/sync v0.1.0
