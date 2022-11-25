@@ -3,7 +3,7 @@ module go.blockdaemon.com/pyth_exporter
 go 1.18
 
 require (
-	github.com/gagliardetto/solana-go v1.7.1
+	github.com/gagliardetto/solana-go v1.8.0
 	github.com/prometheus/client_golang v1.14.0
 	go.blockdaemon.com/pyth v0.3.7
 	go.uber.org/zap v1.23.0
@@ -23,7 +23,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dfuse-io/logging v0.0.0-20210109005628-b97a57253f70 // indirect
 	github.com/fatih/color v1.13.0 // indirect
-	github.com/gagliardetto/binary v0.7.6 // indirect
+	github.com/gagliardetto/binary v0.7.7 // indirect
 	github.com/gagliardetto/treeout v0.1.4 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
