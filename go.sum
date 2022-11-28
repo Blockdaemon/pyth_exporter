@@ -110,12 +110,11 @@ github.com/fatih/color v1.9.0/go.mod h1:eQcE1qtQxscV5RaZvpXrrb8Drkc3/DdQ+uUYCNjL
 github.com/fatih/color v1.13.0 h1:8LOYc1KYPPmyKMuN8QV2DNRWNbLo6LZ0iLs8+mlH53w=
 github.com/fatih/color v1.13.0/go.mod h1:kLAiJbzzSOZDVNGyDpeOxJ47H46qBXwg5ILebYFFOfk=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
-github.com/gagliardetto/binary v0.7.3/go.mod h1:mUuay5LL8wFVnIlecHakSZMvcdqfs+CsotR5n77kyjM=
-github.com/gagliardetto/binary v0.7.6 h1:8K3ZB9cEffv6XVqybOR7WxFTTsB1FDWHkv28Pg2tTPc=
-github.com/gagliardetto/binary v0.7.6/go.mod h1:mUuay5LL8wFVnIlecHakSZMvcdqfs+CsotR5n77kyjM=
+github.com/gagliardetto/binary v0.7.7 h1:QZpT38+sgoPg+TIQjH94sLbl/vX+nlIRA37pEyOsjfY=
+github.com/gagliardetto/binary v0.7.7/go.mod h1:mUuay5LL8wFVnIlecHakSZMvcdqfs+CsotR5n77kyjM=
 github.com/gagliardetto/gofuzz v1.2.2/go.mod h1:bkH/3hYLZrMLbfYWA0pWzXmi5TTRZnu4pMGZBkqMKvY=
-github.com/gagliardetto/solana-go v1.7.1 h1:1zptQe8jroTVpWKgvTcRTPMJ8kdiE2P6MmhnOO+r6jA=
-github.com/gagliardetto/solana-go v1.7.1/go.mod h1:AXNlsBGSxT6OhwfH2ofFkDUwA2yGry0e15OH+h2t8Jk=
+github.com/gagliardetto/solana-go v1.8.0 h1:gDr/YbvWHDnhTKScjsziwMntD0c2hS6c+utFNzZ7p1M=
+github.com/gagliardetto/solana-go v1.8.0/go.mod h1:flaYaZ3X+h1Iz6rXAYwV4jJlT4cDFmXCwrmQRt1f7Hk=
 github.com/gagliardetto/treeout v0.1.4 h1:ozeYerrLCmCubo1TcIjFiOWTTGteOOHND1twdFpgwaw=
 github.com/gagliardetto/treeout v0.1.4/go.mod h1:loUefvXTrlRG5rYmJmExNryyBRh8f89VZhmMOyCyqok=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
