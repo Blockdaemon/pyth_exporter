@@ -3,7 +3,7 @@ module go.blockdaemon.com/pyth_exporter
 go 1.19
 
 require (
-	github.com/gagliardetto/solana-go v1.8.4
+	github.com/gagliardetto/solana-go v1.9.3
 	github.com/prometheus/client_golang v1.19.0
 	go.blockdaemon.com/pyth v0.3.7
 	go.uber.org/zap v1.27.0
@@ -25,6 +25,7 @@ require (
 	github.com/gagliardetto/binary v0.7.7 // indirect
 	github.com/gagliardetto/treeout v0.1.4 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/rpc v1.2.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
